@@ -1,0 +1,702 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>TV en Español — Explorer</title>
+  <style>
+    :root { color-scheme: dark; }
+    body {
+      margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: #0b0f17; color: #e8eefc;
+    }
+    header {
+      position: sticky; top: 0; z-index: 10;
+      background: rgba(11,15,23,0.85);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .wrap { max-width: 1180px; margin: 0 auto; padding: 18px 16px; }
+    h1 { margin: 0; font-size: 18px; letter-spacing: .2px; }
+    .sub { margin-top: 6px; opacity: .8; font-size: 12.5px; line-height: 1.35; }
+    .grid {
+      display: grid; grid-template-columns: 1fr; gap: 12px;
+      padding: 14px 0 20px;
+    }
+    @media (min-width: 900px) { .grid { grid-template-columns: 1.1fr .9fr; } }
+
+    .card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+    }
+    .card .hd { padding: 14px 14px 10px; border-bottom: 1px solid rgba(255,255,255,0.08); }
+    .card .bd { padding: 14px; }
+
+    .controls {
+      display: grid; grid-template-columns: 1fr; gap: 10px;
+    }
+    @media (min-width: 700px) { .controls { grid-template-columns: 1.2fr .8fr .8fr; } }
+    label { font-size: 12px; opacity: .9; display:block; margin: 0 0 6px; }
+    input, select {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(0,0,0,0.25);
+      color: #e8eefc;
+      outline: none;
+    }
+    input::placeholder { color: rgba(232,238,252,0.45); }
+
+    .row { display:flex; flex-wrap: wrap; gap: 10px; align-items:center; margin-top: 10px; }
+    .btn {
+      border: 1px solid rgba(255,255,255,0.16);
+      background: rgba(255,255,255,0.06);
+      color: #e8eefc;
+      padding: 9px 12px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: transform .05s ease, background .2s ease;
+      user-select: none;
+    }
+    .btn:hover { background: rgba(255,255,255,0.10); }
+    .btn:active { transform: translateY(1px); }
+    .btn.primary {
+      border-color: rgba(110,231,183,0.5);
+      background: rgba(110,231,183,0.10);
+    }
+    .pill {
+      font-size: 12px; padding: 6px 10px; border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.05);
+      opacity: .95;
+    }
+    .muted { opacity: .75; }
+    .small { font-size: 12px; opacity: .75; }
+
+    .list { display:grid; grid-template-columns: 1fr; gap: 10px; }
+    @media (min-width: 620px) { .list { grid-template-columns: 1fr 1fr; } }
+    @media (min-width: 980px) { .list { grid-template-columns: 1fr 1fr 1fr; } }
+
+    .ch {
+      display:flex; gap: 10px; align-items:center;
+      padding: 10px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(255,255,255,0.03);
+    }
+    .logo {
+      width: 44px; height: 44px; border-radius: 12px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.10);
+      display:flex; align-items:center; justify-content:center;
+      overflow:hidden; flex: 0 0 auto;
+    }
+    .logo img { width: 100%; height: 100%; object-fit: cover; display:block; }
+    .meta { min-width: 0; flex: 1 1 auto; }
+    .name { font-weight: 800; font-size: 13.5px; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .tags { margin-top: 6px; display:flex; flex-wrap:wrap; gap: 6px; }
+    .tag { font-size: 11px; padding: 4px 8px; border-radius: 999px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.10); opacity: .9; }
+    .actions { display:flex; gap: 8px; flex: 0 0 auto; }
+    .iconbtn {
+      width: 38px; height: 38px; border-radius: 12px;
+      display:flex; align-items:center; justify-content:center;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.06);
+      cursor:pointer;
+    }
+    .iconbtn:hover { background: rgba(255,255,255,0.10); }
+
+    .player {
+      display:grid; gap: 10px;
+    }
+    video, iframe {
+      width: 100%;
+      aspect-ratio: 16/9;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(0,0,0,0.35);
+    }
+    .status {
+      display:flex; flex-wrap: wrap; gap: 10px; align-items:center;
+    }
+    .error { color: #ffb4b4; }
+    .ok { color: #a7f3d0; }
+    .footer { padding: 16px 0 26px; opacity: .7; font-size: 12px; }
+    a { color: #a7f3d0; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="wrap">
+      <h1>TV en Español — Explorer</h1>
+      <div class="sub">
+        Carga canales desde el dataset público de Famelack y filtra por idioma (español).<br/>
+        Nota: el esquema de campos puede cambiar con el tiempo, así que el código es “tolerante”. (Eso es una forma bonita de decir: no te cases con un JSON.) 
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <div class="grid">
+      <section class="card">
+        <div class="hd">
+          <div class="status">
+            <span class="pill" id="pillDataset">Dataset: sin cargar</span>
+            <span class="pill" id="pillCount">Canales: 0</span>
+            <span class="pill" id="pillFavs">Favoritos: 0</span>
+            <span class="small muted" id="hint"></span>
+          </div>
+        </div>
+        <div class="bd">
+          <div class="controls">
+            <div>
+              <label for="q">Buscar</label>
+              <input id="q" placeholder="Ej: noticias, deportes, tele, cuba, españa..." />
+            </div>
+            <div>
+              <label for="country">País (solo hispanohablantes)</label>
+              <select id="country"></select>
+            </div>
+            <div>
+              <label for="category">Categoría</label>
+              <select id="category"></select>
+            </div>
+          </div>
+
+          <div class="row">
+            <button class="btn primary" id="btnLoad">Cargar canales</button>
+            <button class="btn" id="btnReload">Recargar</button>
+            <button class="btn" id="btnFavs">Ver favoritos</button>
+            <span class="small muted">Tip: si algo no reproduce en el navegador, usa “Abrir” y lo mandas a VLC / app IPTV.</span>
+          </div>
+
+          <div style="margin-top:14px" class="list" id="list"></div>
+
+          <div class="footer">
+            Fuente de datos: repo público del dataset de Famelack. Si mañana cambian campos, hoy no es culpa mía… es del futuro. 😄
+          </div>
+        </div>
+      </section>
+
+      <aside class="card">
+        <div class="hd">
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:12px;">
+            <div>
+              <div style="font-weight:800">Reproductor</div>
+              <div class="small muted">IPTV (m3u8/mpd) si el navegador lo soporta; YouTube si aplica.</div>
+            </div>
+            <a class="pill" id="openRaw" href="#" target="_blank" rel="noopener">Abrir enlace</a>
+          </div>
+        </div>
+        <div class="bd">
+          <div class="player" id="player">
+            <video id="video" controls playsinline></video>
+            <iframe id="yt" title="YouTube Live" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="display:none"></iframe>
+            <div class="small muted" id="playerMeta"></div>
+            <div class="small" id="playerStatus"></div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <script>
+    // ========= Config =========
+    // Dataset oficial (raw GitHub). Repo: famelack/famelack-channels :contentReference[oaicite:1]{index=1}
+    const DATASET_BASE = "https://raw.githubusercontent.com/famelack/famelack-channels/main/channels/raw";
+    const COUNTRIES_META_URL = `${DATASET_BASE}/countries_metadata.json`;
+    const COUNTRY_URL = (code) => `${DATASET_BASE}/countries/${code}.json`;
+
+    // Lista de países hispanohablantes (para no descargar 100+ países).
+    // Puedes añadir/quitar códigos si quieres (por ejemplo "US" si quieres canales hispanos en EE.UU., pero ahí ya no es “solo español” garantizado).
+    const SPANISH_COUNTRIES = [
+      { code:"ES", name:"España" },
+      { code:"MX", name:"México" },
+      { code:"AR", name:"Argentina" },
+      { code:"CO", name:"Colombia" },
+      { code:"CL", name:"Chile" },
+      { code:"PE", name:"Perú" },
+      { code:"VE", name:"Venezuela" },
+      { code:"EC", name:"Ecuador" },
+      { code:"CU", name:"Cuba" },
+      { code:"DO", name:"República Dominicana" },
+      { code:"GT", name:"Guatemala" },
+      { code:"HN", name:"Honduras" },
+      { code:"SV", name:"El Salvador" },
+      { code:"NI", name:"Nicaragua" },
+      { code:"CR", name:"Costa Rica" },
+      { code:"PA", name:"Panamá" },
+      { code:"UY", name:"Uruguay" },
+      { code:"PY", name:"Paraguay" },
+      { code:"BO", name:"Bolivia" },
+      { code:"PR", name:"Puerto Rico" }
+    ];
+
+    const SPANISH_TOKENS = new Set(["es","spa","spanish","español","castellano"]);
+
+    // ========= Helpers (schema-tolerant) =========
+    const $ = (id) => document.getElementById(id);
+
+    function norm(s){ return (s ?? "").toString().trim().toLowerCase(); }
+
+    function getName(ch){
+      return ch?.name || ch?.title || ch?.channel || "Sin nombre";
+    }
+    function getLogo(ch){
+      return ch?.logo || ch?.logoUrl || ch?.icon || "";
+    }
+    function getCategories(ch){
+      const v = ch?.categories ?? ch?.category ?? ch?.group ?? [];
+      if (Array.isArray(v)) return v.filter(Boolean);
+      if (typeof v === "string" && v.trim()) return [v.trim()];
+      return [];
+    }
+    function getCountryCode(ch){
+      return ch?.country || ch?.countryCode || ch?.cc || "";
+    }
+
+    function getLanguages(ch){
+      const out = new Set();
+
+      // variantes comunes
+      for (const key of ["languages","language","lang"]) {
+        const v = ch?.[key];
+        if (Array.isArray(v)) v.forEach(x => { if (typeof x==="string") out.add(norm(x)); });
+        else if (typeof v==="string") out.add(norm(v));
+      }
+
+      // a veces viene en meta/metadata
+      const meta = ch?.meta || ch?.metadata || {};
+      if (meta && typeof meta === "object") {
+        const v = meta.languages || meta.language;
+        if (Array.isArray(v)) v.forEach(x => { if (typeof x==="string") out.add(norm(x)); });
+        else if (typeof v==="string") out.add(norm(v));
+      }
+
+      out.delete("");
+      return out;
+    }
+
+    function isSpanish(ch){
+      const langs = getLanguages(ch);
+      for (const t of langs) if (SPANISH_TOKENS.has(t)) return true;
+
+      // fallback suave: si NO hay idioma declarado, pero el país es hispano, lo aceptamos
+      // (puedes endurecerlo quitando este bloque)
+      if (langs.size === 0) {
+        const cc = norm(getCountryCode(ch));
+        if (SPANISH_COUNTRIES.some(x => norm(x.code) === cc)) return true;
+      }
+      return false;
+    }
+
+    function getStreamUrl(ch){
+      // intenta campos típicos
+      let url = ch?.url || ch?.stream || ch?.streamUrl || ch?.link || "";
+      if (typeof url === "string" && url.trim()) return url.trim();
+
+      // sources puede ser lista de strings o lista de objetos
+      const sources = ch?.sources;
+      if (Array.isArray(sources) && sources.length) {
+        const s0 = sources[0];
+        if (typeof s0 === "string") return s0.trim();
+        if (s0 && typeof s0 === "object") {
+          const u = s0.url || s0.stream || s0.link || "";
+          if (typeof u === "string" && u.trim()) return u.trim();
+        }
+      }
+      return "";
+    }
+
+    function isYouTube(url){
+      const u = norm(url);
+      return u.includes("youtube.com") || u.includes("youtu.be");
+    }
+
+    function toYouTubeEmbed(url){
+      // soporta youtu.be/<id> o youtube.com/watch?v=<id>
+      try {
+        const u = new URL(url);
+        if (u.hostname.includes("youtu.be")) {
+          const id = u.pathname.replace("/","").trim();
+          if (id) return `https://www.youtube.com/embed/${id}?autoplay=1&mute=0`;
+        }
+        if (u.hostname.includes("youtube.com")) {
+          const id = u.searchParams.get("v");
+          if (id) return `https://www.youtube.com/embed/${id}?autoplay=1&mute=0`;
+          // si ya viene /embed/...
+          if (u.pathname.includes("/embed/")) return url;
+        }
+      } catch(_) {}
+      return url;
+    }
+
+    // ========= State =========
+    let countriesMeta = null;
+    let channels = [];
+    let showingFavs = false;
+
+    const LS_FAVS = "tv_es_favs_v1";
+
+    function loadFavs(){
+      try { return JSON.parse(localStorage.getItem(LS_FAVS) || "[]"); }
+      catch { return []; }
+    }
+    function saveFavs(list){
+      localStorage.setItem(LS_FAVS, JSON.stringify(list));
+      updateFavPill();
+    }
+    function favKey(ch){
+      // clave "estable-ish": nombre + url
+      return `${getName(ch)}|||${getStreamUrl(ch)}`;
+    }
+    function isFav(ch){
+      const f = new Set(loadFavs());
+      return f.has(favKey(ch));
+    }
+    function toggleFav(ch){
+      const f = new Set(loadFavs());
+      const k = favKey(ch);
+      if (f.has(k)) f.delete(k); else f.add(k);
+      saveFavs([...f]);
+      render();
+    }
+
+    // ========= UI =========
+    function setPill(el, text, ok=false){
+      el.textContent = text;
+      el.classList.toggle("ok", ok);
+      el.classList.toggle("error", !ok);
+    }
+    function updateFavPill(){
+      $("pillFavs").textContent = `Favoritos: ${loadFavs().length}`;
+    }
+
+    function fillCountrySelect(){
+      const sel = $("country");
+      sel.innerHTML = "";
+      const optAll = document.createElement("option");
+      optAll.value = "__ALL__";
+      optAll.textContent = "Todos (hispanohablantes)";
+      sel.appendChild(optAll);
+
+      for (const c of SPANISH_COUNTRIES) {
+        const o = document.createElement("option");
+        o.value = c.code;
+        o.textContent = c.name;
+        sel.appendChild(o);
+      }
+    }
+
+    function fillCategorySelect(){
+      const sel = $("category");
+      sel.innerHTML = "";
+      const o0 = document.createElement("option");
+      o0.value = "__ALL__";
+      o0.textContent = "Todas";
+      sel.appendChild(o0);
+
+      const set = new Set();
+      for (const ch of channels) getCategories(ch).forEach(x => set.add(x));
+      [...set].sort((a,b)=> a.localeCompare(b,"es")).forEach(cat => {
+        const o = document.createElement("option");
+        o.value = cat;
+        o.textContent = cat;
+        sel.appendChild(o);
+      });
+    }
+
+    function filtered(){
+      const q = norm($("q").value);
+      const country = $("country").value;
+      const cat = $("category").value;
+
+      let base = channels;
+
+      if (showingFavs) {
+        const favs = new Set(loadFavs());
+        base = base.filter(ch => favs.has(favKey(ch)));
+      }
+
+      return base.filter(ch => {
+        const name = norm(getName(ch));
+        if (q && !name.includes(q)) return false;
+
+        if (country !== "__ALL__") {
+          const cc = (getCountryCode(ch) || "").toString().toUpperCase();
+          if (cc !== country) return false;
+        }
+
+        if (cat !== "__ALL__") {
+          const cats = getCategories(ch);
+          if (!cats.includes(cat)) return false;
+        }
+
+        return true;
+      });
+    }
+
+    function channelCard(ch){
+      const el = document.createElement("div");
+      el.className = "ch";
+
+      const logo = document.createElement("div");
+      logo.className = "logo";
+      const imgUrl = getLogo(ch);
+      if (imgUrl) {
+        const img = document.createElement("img");
+        img.src = imgUrl;
+        img.loading = "lazy";
+        img.referrerPolicy = "no-referrer";
+        logo.appendChild(img);
+      } else {
+        logo.textContent = "TV";
+      }
+
+      const meta = document.createElement("div");
+      meta.className = "meta";
+      const name = document.createElement("div");
+      name.className = "name";
+      name.textContent = getName(ch);
+
+      const tags = document.createElement("div");
+      tags.className = "tags";
+      const cc = getCountryCode(ch);
+      if (cc) tags.appendChild(tagEl(cc.toUpperCase()));
+      const cats = getCategories(ch).slice(0,2);
+      cats.forEach(x => tags.appendChild(tagEl(x)));
+      if (isSpanish(ch)) tags.appendChild(tagEl("ES"));
+
+      meta.appendChild(name);
+      meta.appendChild(tags);
+
+      const actions = document.createElement("div");
+      actions.className = "actions";
+
+      const play = document.createElement("button");
+      play.className = "iconbtn";
+      play.title = "Reproducir";
+      play.innerHTML = "▶";
+      play.onclick = () => playChannel(ch);
+
+      const open = document.createElement("a");
+      open.className = "iconbtn";
+      open.title = "Abrir enlace";
+      open.textContent = "↗";
+      open.href = getStreamUrl(ch) || "#";
+      open.target = "_blank";
+      open.rel = "noopener";
+
+      const fav = document.createElement("button");
+      fav.className = "iconbtn";
+      fav.title = "Favorito";
+      fav.innerHTML = isFav(ch) ? "★" : "☆";
+      fav.onclick = () => toggleFav(ch);
+
+      actions.appendChild(play);
+      actions.appendChild(open);
+      actions.appendChild(fav);
+
+      el.appendChild(logo);
+      el.appendChild(meta);
+      el.appendChild(actions);
+
+      return el;
+    }
+
+    function tagEl(text){
+      const t = document.createElement("span");
+      t.className = "tag";
+      t.textContent = text;
+      return t;
+    }
+
+    function render(){
+      const list = $("list");
+      list.innerHTML = "";
+
+      const arr = filtered();
+      $("pillCount").textContent = `Canales: ${arr.length}${showingFavs ? " (favs)" : ""}`;
+
+      if (!arr.length) {
+        const d = document.createElement("div");
+        d.className = "small muted";
+        d.textContent = "Nada por aquí. Prueba otro término, país o categoría.";
+        list.appendChild(d);
+        return;
+      }
+
+      arr.slice(0, 300).forEach(ch => list.appendChild(channelCard(ch)));
+
+      if (arr.length > 300) {
+        const d = document.createElement("div");
+        d.className = "small muted";
+        d.textContent = `Mostrando 300 de ${arr.length}. Afina la búsqueda para ver el resto.`;
+        list.appendChild(d);
+      }
+    }
+
+    function setPlayerStatus(msg, ok=true){
+      const el = $("playerStatus");
+      el.textContent = msg;
+      el.className = "small " + (ok ? "ok" : "error");
+    }
+
+    function playChannel(ch){
+      const url = getStreamUrl(ch);
+      const name = getName(ch);
+
+      $("playerMeta").textContent = `${name}${url ? " — " + url : ""}`;
+      $("openRaw").href = url || "#";
+
+      const video = $("video");
+      const yt = $("yt");
+
+      if (!url) {
+        video.removeAttribute("src");
+        yt.style.display = "none";
+        video.style.display = "block";
+        setPlayerStatus("Este canal no trae URL de stream en los datos.", false);
+        return;
+      }
+
+      if (isYouTube(url)) {
+        // YouTube embed
+        video.pause();
+        video.removeAttribute("src");
+        video.style.display = "none";
+        yt.style.display = "block";
+        yt.src = toYouTubeEmbed(url);
+        setPlayerStatus("Reproduciendo YouTube (si el canal está disponible).", true);
+        return;
+      }
+
+      // IPTV (m3u8/mpd/etc.) — puede que el navegador no lo soporte
+      yt.src = "";
+      yt.style.display = "none";
+      video.style.display = "block";
+      video.src = url;
+
+      const tryPlay = video.play();
+      if (tryPlay && typeof tryPlay.then === "function") {
+        tryPlay.then(() => {
+          setPlayerStatus("Intentando reproducir en el navegador…", true);
+        }).catch(() => {
+          setPlayerStatus("Tu navegador no pudo reproducirlo. Usa “Abrir enlace” y llévalo a VLC/app IPTV.", false);
+        });
+      } else {
+        setPlayerStatus("Intentando reproducir…", true);
+      }
+    }
+
+    // ========= Data loading =========
+    async function fetchJson(url){
+      const res = await fetch(url, { cache: "no-store" });
+      if (!res.ok) throw new Error(`HTTP ${res.status} — ${url}`);
+      return await res.json();
+    }
+
+    async function loadDatasetMeta(){
+      setPill($("pillDataset"), "Dataset: cargando…", true);
+      $("hint").textContent = "Leyendo countries_metadata…";
+
+      countriesMeta = await fetchJson(COUNTRIES_META_URL);
+
+      setPill($("pillDataset"), "Dataset: OK", true);
+      $("hint").textContent = "Listo. Ahora carga canales.";
+    }
+
+    async function loadChannels(){
+      showingFavs = false;
+
+      $("hint").textContent = "Cargando canales (solo español)…";
+      setPlayerStatus("Selecciona un canal para reproducir.", true);
+
+      const sel = $("country").value;
+      const targets = (sel === "__ALL__")
+        ? SPANISH_COUNTRIES.map(x => x.code)
+        : [sel];
+
+      // Bajamos solo los países hispanohablantes seleccionados
+      const results = [];
+      for (const code of targets) {
+        try {
+          const data = await fetchJson(COUNTRY_URL(code));
+          // data puede ser lista o {channels:[...]}
+          const list = Array.isArray(data) ? data : (data?.channels || []);
+          for (const ch of list) {
+            if (ch && typeof ch === "object") results.push(ch);
+          }
+        } catch (e) {
+          console.warn("No pude cargar país", code, e);
+        }
+      }
+
+      // filtro ES
+      channels = results.filter(isSpanish);
+
+      // normaliza country code si falta y el select fue por país
+      channels = channels.map(ch => {
+        const cc = getCountryCode(ch);
+        if (!cc && sel !== "__ALL__") return { ...ch, country: sel };
+        return ch;
+      });
+
+      fillCategorySelect();
+      render();
+
+      $("hint").textContent = `Cargados ${channels.length} canales en español (puede variar según el dataset).`;
+    }
+
+    // ========= Boot =========
+    function wire(){
+      fillCountrySelect();
+      updateFavPill();
+
+      $("btnLoad").onclick = () => loadChannels().catch(err => {
+        console.error(err);
+        $("hint").textContent = "Error cargando canales. Revisa consola.";
+      });
+
+      $("btnReload").onclick = async () => {
+        try {
+          await loadDatasetMeta();
+          await loadChannels();
+        } catch (e) {
+          console.error(e);
+          setPill($("pillDataset"), "Dataset: ERROR", false);
+          $("hint").textContent = "No pude cargar el dataset (¿bloqueo del navegador o CORS?).";
+        }
+      };
+
+      $("btnFavs").onclick = () => {
+        showingFavs = !showingFavs;
+        $("btnFavs").textContent = showingFavs ? "Ver todo" : "Ver favoritos";
+        render();
+      };
+
+      $("q").addEventListener("input", render);
+      $("country").addEventListener("change", async () => {
+        // recarga canales al cambiar país para no mezclar datasets
+        await loadChannels().catch(console.error);
+      });
+      $("category").addEventListener("change", render);
+
+      // carga metadata al iniciar
+      loadDatasetMeta().catch(e => {
+        console.error(e);
+        setPill($("pillDataset"), "Dataset: ERROR", false);
+        $("hint").textContent = "No pude cargar countries_metadata. Importante: esto debe estar servido por HTTP/HTTPS (no file://).";
+      });
+    }
+
+    wire();
+  </script>
+</body>
+</html>
