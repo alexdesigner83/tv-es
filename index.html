@@ -283,18 +283,10 @@
       return out;
     }
 
-    function isSpanish(ch){
-      const langs = getLanguages(ch);
-      for (const t of langs) if (SPANISH_TOKENS.has(t)) return true;
-
-      // fallback suave: si NO hay idioma declarado, pero el país es hispano, lo aceptamos
-      // (puedes endurecerlo quitando este bloque)
-      if (langs.size === 0) {
-        const cc = norm(getCountryCode(ch));
-        if (SPANISH_COUNTRIES.some(x => norm(x.code) === cc)) return true;
-      }
-      return false;
-    }
+function isSpanish(ch){
+  const cc = (getCountryCode(ch) || "").toUpperCase();
+  return SPANISH_COUNTRIES.some(x => x.code === cc);
+}
 
     function getStreamUrl(ch){
       // intenta campos típicos
