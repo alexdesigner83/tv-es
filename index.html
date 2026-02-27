@@ -631,7 +631,7 @@ function isSpanish(ch){
       }
 
       // filtro ES
-      channels = results.filter(isSpanish);
+      channels = results;
 
       // normaliza country code si falta y el select fue por país
       channels = channels.map(ch => {
